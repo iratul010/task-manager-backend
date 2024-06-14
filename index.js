@@ -27,10 +27,26 @@ async function run() {
    
     await client.connect();
     //tasks
-    const productDB = client.db("tasksManagerDB");
-    const foodsCollection = productDB.collection("tasksCollection");
+    const tasksDB = client.db("taskManagerDB");
+    const tasksCollection = tasksDB.collection("tasksCollection");
  
-  } catch(err){}
+
+ //post method for used insertOne method here
+ app.post("/task", async (req, res) => {
+  const taskData = req.body;
+  
+  const result = await tasksCollection.insertOne(taskData);
+  res.send(result);
+});
+app.get("/tasks", async (req, res) => {
+  const taskData = tasksCollection.find();
+  const result = await taskData.toArray();
+  res.send(result);
+});
+
+  } catch(err){
+    console.log(err)
+  }
 }
 run().catch(console.dir);
 
