@@ -26,11 +26,45 @@ async function run() {
   try {
    
     await client.connect();
+    //user
+    const userDB = client.db("userDB");
+    const userCollection =userDB.collection("userCollection");
     //tasks
     const tasksDB = client.db("taskManagerDB");
     const tasksCollection = tasksDB.collection("tasksCollection");
  
 
+
+
+  //user
+  app.post("/user", async (req, res) => {
+    const user = req.body;
+     const existEmail = await userCollection.findOne({email:user?.email});
+     if(!existEmail){
+
+       const result = await userCollection.insertOne(user);
+       res.send(result);
+     }
+     else{
+      res.send( {
+        status:'success',
+        message:'Login success'
+      })
+     }
+  });   
+  app.get("/user/:email", async (req, res) => {
+    const email = req.params.email;
+     const user = await userCollection.findOne({email})//email===email:email (same)
+       res.send(user);
+ 
+  });   
+  app.patch("/user/:email", async (req, res) => {
+    const email = req.params.email;
+    const userData = req.body;
+     const result = await userCollection.updateOne({email},{$set:userData},{upsert:true})//email===email:email (same)
+       res.send(result);
+ 
+  });   
  //post method for used insertOne method here
  app.post("/task", async (req, res) => {
   const taskData = req.body;
